@@ -48,6 +48,8 @@ Visit [Owncast's Documentation](https://owncast.online/docs) for additional info
 
 * This operates as a live stream just like if you were streaming from OBS, Streamlabs, vMix, etc.  It will require enough hardware to generate this video and enough bandwidth to stream it to your live streaming provider.  If your machine or internet connection can't handle streaming via other methods, it's unlikely you'll be able to stream with this one.
 
+* You may want to run utility on a machine separate from your actual streaming server as you may run into hardware utilization limits with two video processing applications running at once.  But you can run it anywhere, including a machine on your personal home internet.
+
 * If you would like to stream to multiple livestreaming destinations at once, take a look at [Prism](https://github.com/muesli/prism).
 
 * **Disclaimer:** This is a utility for convenience, experimenting and entertainment.  It was thrown together quickly and is likely not production-grade.  Improvements are welcomed, but feature requests are not likely to be implemented. 

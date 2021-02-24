@@ -1,0 +1,9 @@
+# Required live stream video destination
+streamingURL: http://localhost:8080
+streamingKey: abc123
+
+# Required internet radio station audio URL
+audioUrl: http://14833.live.streamtheworld.com/SAM04AAC147.mp3
+
+# Optional Owncast integration
+# owncastAccessToken: SXLFjULksR2Q_1_OJkho35qhYIlEqMaq0WIlmR3CZGU=

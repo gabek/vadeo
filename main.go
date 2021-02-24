@@ -117,7 +117,7 @@ func connectToStation() {
 
 func stationMetadataChanged(m *shoutcast.Metadata) {
 	log.Println("Now playing: ", m.StreamTitle)
-	components := strings.Split(m.StreamTitle, " - ")
+	components := strings.SplitN(m.StreamTitle, " - ", 1)
 	artist := ""
 	track := ""
 

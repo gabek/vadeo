@@ -31,14 +31,14 @@ It will use your internet radio station to create a live video stream broadcast 
 
 ## Testing
 
-[Owncast](https://owncast.online) provides a free testing server you can use to try out Vadeo.  Visit https://broadcast.owncast.online to get the stream key and you can point Vadeo at it to see it in action.  After testing you can [install your own server](https://owncast.online/quickstart) and expose your station to more people.
+If you just want to try it out with your station, [Owncast](https://owncast.online) provides a free testing server you can use to try out Vadeo.  Visit https://broadcast.owncast.online to get the stream key and you can point Vadeo at it to see it in action.  After testing you can [install your own server](https://owncast.online/quickstart) and expose your station to more people.
 
 ## Optional Owncast support
 
-If you are using Vadeo with Owncast you can take advantage of the additional feature of your track metadata populating the Owncast web interface.
+If you are using Vadeo with Owncast you can take advantage of the feature of your track metadata populating the Owncast web interface.
 
 1. Make sure your Owncast server is v0.0.6 or higher.
-1. In the Owncast admin to to the Integrations/Access Tokens screen.
+1. In the Owncast admin go to the Integrations/Access Tokens screen.
 1. Create a new [access token](https://owncast.online/thirdparty/apis/) with administrative access.
 1. Edit your Vadeo configure file and paste in your Owncast and access token as `owncastAccessToken`.
 

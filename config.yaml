@@ -1,9 +1,10 @@
-# Required live stream video destination
-streamingURL: http://localhost:8080
+# Required live stream video destination.  Should start with rtmp://
+streamingURL: rtmp://127.0.0.1/live
 streamingKey: abc123
 
 # Required internet radio station audio URL
 audioUrl: http://14833.live.streamtheworld.com/SAM04AAC147.mp3
 
 # Optional Owncast integration
+# owncastServerURL: http://localhost:8080
 # owncastAccessToken: SXLFjULksR2Q_1_OJkho35qhYIlEqMaq0WIlmR3CZGU=

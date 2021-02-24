@@ -17,6 +17,7 @@ type Config struct {
 	StreamingURL string `yaml:"streamingURL"`
 	StreamingKey string `yaml:"streamingKey"`
 
+	OwncastServerURL   string `yaml:"owncastServerURL"`
 	OwncastAccessToken string `yaml:"owncastAccessToken"`
 }
 

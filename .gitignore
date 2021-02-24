@@ -25,3 +25,4 @@ videos/
 config-*.yaml
 !background.mp4
 !config-default.yaml
+dist/

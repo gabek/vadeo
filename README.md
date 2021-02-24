@@ -14,6 +14,11 @@ It will use your internet radio station to create a live video stream broadcast 
 1. A background video you want to loop.
 1. `ffmpeg` to be [installed](https://ffmpeg.org/download.html) on your system.
 
+## Install
+
+1. Visit the releases page to download a version for your platform.
+1. `tar xvf vadeo_vx.x.x-version.tar.gz`
+1. `./vadeo`
 ## Setup
 
 1. Copy your logo to `logo.png`.  Resize it and add transparency as needed.

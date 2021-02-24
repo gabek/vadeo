@@ -11,6 +11,7 @@ import (
 	"path"
 	"strings"
 	"syscall"
+	"time"
 
 	"github.com/gabek/vadeo/owncast"
 	shoutcast "github.com/gabek/vadeo/shoutcast"
@@ -143,6 +144,11 @@ func stationMetadataChanged(m *shoutcast.Metadata) {
 	ioutil.WriteFile(_trackTextFile, []byte(track), 0644)
 
 	if _config.OwncastAccessToken != "" {
-		owncast.SetStreamTitle(m.StreamTitle)
+		go func() {
+			// A bit of a hack to offset the fact that the video stream
+			// will be multiple seconds behind.
+			time.Sleep(3 * time.Second)
+			owncast.SetStreamTitle(m.StreamTitle)
+		}()
 	}
 }

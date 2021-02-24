@@ -25,6 +25,9 @@ const (
 var _config = loadConfig()
 var _pipe *os.File
 
+var _stationTitle = ""
+var _stationDescription = ""
+
 func main() {
 	setup()
 	connectToStation()
@@ -103,6 +106,9 @@ func connectToStation() {
 		panic(err)
 	}
 
+	_stationTitle = stream.Name
+	_stationDescription = stream.Description
+
 	log.Println("Connected to", stream.Name, stream.Description)
 
 	stream.MetadataCallbackFunc = stationMetadataChanged
@@ -117,13 +123,20 @@ func connectToStation() {
 
 func stationMetadataChanged(m *shoutcast.Metadata) {
 	log.Println("Now playing: ", m.StreamTitle)
-	components := strings.SplitN(m.StreamTitle, " - ", 1)
+	components := strings.SplitN(m.StreamTitle, " - ", 2)
 	artist := ""
 	track := ""
 
 	artist = components[0]
 	if len(components) > 1 {
 		track = components[1]
+	}
+
+	if artist == "" && track == "" {
+		artist = _stationTitle
+		track = _stationDescription
+	} else if track == "" {
+		track = _stationTitle
 	}
 
 	ioutil.WriteFile(_artistTextFile, []byte(artist), 0644)

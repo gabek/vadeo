@@ -117,7 +117,7 @@ func connectToStation() {
 	go func() {
 		_, err = io.Copy(_pipe, stream)
 		if err != nil {
-			panic(err)
+			panic(fmt.Errorf("unable to write to %s: %s", _audioPipeFile, err))
 		}
 	}()
 }

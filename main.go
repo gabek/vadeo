@@ -77,9 +77,9 @@ func start() {
 		filter,
 		"-map", "[v]",
 		"-map", "0:a:0",
-		"-c:v", "libx264", "-preset", "faster", "-b:v", "4000k",
+		"-c:v", "libx264", "-preset", "veryfast", "-b:v", "4000k",
 		"-g", "30",
-		"-c:a", "aac", "-b:a", "192k", "-ar", "44100",
+		"-c:a", "aac", "-b:a", "128k", "-ar", "44100",
 		"-f", "flv",
 		rtmpDestination.String(),
 		"2> log.txt",
@@ -104,7 +104,7 @@ func start() {
 func connectToStation() {
 	stream, err := shoutcast.Open(_config.AudioURL)
 	if err != nil {
-		panic(err)
+		panic(fmt.Errorf("error connecting to %s %s", _config.AudioURL, err))
 	}
 
 	_stationTitle = stream.Name

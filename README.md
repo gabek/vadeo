@@ -4,6 +4,12 @@
 
 People like video streams, but that doesn't mean your internet radio station has to be ignored.  Stream your shoutcast-compatible internet radio station as a live video stream and reach a whole new audience.
 
+<p>
+    <center>
+        <img src="screenshot.jpg" width=80%>
+    </center>
+</p>
+
 ## What it does
 
 It will use your internet radio station to create a live video stream broadcast via RTMP to any live streaming platform such as [Owncast](https://owncast.online).  It will generate a 720p video stream with the now playing metadata (as provided by your radio stream), your logo, a background video loop, and an audio visualizer.

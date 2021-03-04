@@ -6,7 +6,7 @@ People like video streams, but that doesn't mean your internet radio station has
 
 <p>
     <center>
-        <img src="screenshot.jpg" width=80%>
+        <img src="screenshot.jpg" width=70%>
     </center>
 </p>
 

@@ -18,9 +18,9 @@ import (
 )
 
 const (
-	_audioPipeFile  = ".pipe.mp3"
-	_artistTextFile = ".artist.txt"
-	_trackTextFile  = ".track.txt"
+	_audioPipeFile  = "./.pipe.mp3"
+	_artistTextFile = "./.artist.txt"
+	_trackTextFile  = "./.track.txt"
 )
 
 var _config = loadConfig()

@@ -21,7 +21,7 @@ mkbackground.sh
 log.txt
 *.flv
 .*.*
-videos/
+videos*/
 config-*.yaml
 !background.mp4
 !config-default.yaml

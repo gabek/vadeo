@@ -5,6 +5,6 @@ streamingKey: abc123
 # Required internet radio station audio URL
 audioUrl: http://14833.live.streamtheworld.com/SAM04AAC147.mp3
 
-# Optional Owncast integration
+# Optional Owncast integration for v0.0.6+
 # owncastServerURL: http://localhost:8080
 # owncastAccessToken: SXLFjULksR2Q_1_OJkho35qhYIlEqMaq0WIlmR3CZGU=

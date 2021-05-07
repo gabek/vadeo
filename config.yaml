@@ -1,10 +1,13 @@
 # Required live stream video destination.  Should start with rtmp://
-streamingURL: rtmp://127.0.0.1/live
-streamingKey: abc123
+# streamingURL: rtmp://127.0.0.1/live
+# streamingKey: abc123
+
+streamingURL: rtmp://157.245.243.69:30004/live
+streamingKey: 30004/live/ggv6iez8i7ih2h506637kh577ao5rjrx9
 
 # Required internet radio station audio URL
-audioUrl: http://14833.live.streamtheworld.com/SAM04AAC147.mp3
+audioUrl: http://16963.live.streamtheworld.com:80/SAM04AAC147_SC
 
 # Optional Owncast integration for v0.0.6+
-# owncastServerURL: http://localhost:8080
-# owncastAccessToken: SXLFjULksR2Q_1_OJkho35qhYIlEqMaq0WIlmR3CZGU=
+owncastServerURL: http://goth.land
+owncastAccessToken: 6rBppLOi9M89UhOXhhf15yqsUvT2cindL0ofgk87o0E=

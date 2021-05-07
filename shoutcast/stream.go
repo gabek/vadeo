@@ -108,6 +108,7 @@ func (s *Stream) Read(buf []byte) (dataLen int, err error) {
 		skip, e := s.extractMetadata(buf[checkedDataLen+offset:])
 		if e != nil {
 			err = e
+			fmt.Println(err)
 		}
 		s.pos = 0
 		if offset+skip > uncheckedDataLen {

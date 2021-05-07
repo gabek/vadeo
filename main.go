@@ -67,19 +67,27 @@ func start() {
 		"-y",
 
 		"-thread_queue_size", "9999",
-		"-re", "-f", "mp3", "-i", _audioPipeFile,
+		"-re",
+		"-f", "mp3", "-i", _audioPipeFile,
 
+		"-re",
 		"-thread_queue_size", "9999",
 		"-stream_loop", "-1",
-
+		"-r", "24",
 		"-i background.mp4",
+
 		"-i logo.png",
 		filter,
 		"-map", "[v]",
 		"-map", "0:a:0",
-		"-c:v", "libx264", "-preset", "veryfast", "-b:v", "4000k",
+		"-c:v", "libx264",
+		"-preset", "veryfast",
+		"-profile:v", "high",
+		"-pix_fmt", "yuv420p",
 		"-g", "30",
+		"-crf", "25",
 		"-c:a", "aac", "-b:a", "128k", "-ar", "44100",
+		"-threads", "0",
 		"-f", "flv",
 		rtmpDestination.String(),
 		"2> log.txt",
@@ -147,7 +155,7 @@ func stationMetadataChanged(m *shoutcast.Metadata) {
 		go func() {
 			// A bit of a hack to offset the fact that the video stream
 			// will be multiple seconds behind.
-			time.Sleep(3 * time.Second)
+			time.Sleep(5 * time.Second)
 			owncast.SetStreamTitle(m.StreamTitle)
 		}()
 	}

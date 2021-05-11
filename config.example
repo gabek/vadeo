@@ -1,0 +1,24 @@
+# Required live stream video destination.  Should start with rtmp://
+streamingURL: rtmp://owncast.myserver.com/live
+streamingKey: ggv6i-my-key-for-streaming-5rjrx9
+
+# Required internet radio station audio URL
+audioUrl: http://16963.live.streamtheworld.com:80/SAM04AAC147_SC
+audioBitrate: 128
+
+# This is the bitrate and framerate that vadeo sends to your server, not what your server sends to viewers.
+# https://trac.ffmpeg.org/wiki/Encode/H.264#crf.
+# Video quality level: 0 is lossless, 23 is the default, and 51 is worst quality possible.  You probably want to stick in the 20s for streaming video.
+videoQualityLevel: 25
+framerate: 24
+
+# Select from https://trac.ffmpeg.org/wiki/Encode/H.264.
+# Faster is less CPU use, larger video size, and lower quality.
+# Slower is more CPU use, smaller video sizes, and higher quality.
+# I don't recommend anything outside of "faster" and "fast".
+cpuUsage: faster
+
+# Optional Owncast integration for v0.0.6+.
+# Read more at https://owncast.online/thirdparty/apis
+# owncastServerURL: https://owncast.myserver.com
+# owncastAccessToken: fjkf983jf-my-owncast-access-token

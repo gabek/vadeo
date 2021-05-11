@@ -32,9 +32,10 @@ It will use your internet radio station to create a live video stream broadcast 
 
 ## Edit `config.yaml`.
 
+1. Copy `config.example` to `config.yaml`.
 1. Find the audio stream URL to your internet radio station.  Not the web page url, the actual audio stream.  Set it in the config as `audioUrl`.
 1. Put the RTMP video streaming endpoint as `streamingURL` and your stream key as `streamingKey`.
-
+1. Edit video quality, framerate and audio bitrate.  You likely want to match the audio bitrate to whatever your internet radio station is.
 ## Testing
 
 If you just want to try it out with your station, [Owncast](https://owncast.online) provides a free testing server you can use to try out Vadeo.  Visit https://broadcast.owncast.online to get the stream key and you can point Vadeo at it to see it in action.  After testing you can [install your own server](https://owncast.online/quickstart) and expose your station to more people.

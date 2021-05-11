@@ -61,6 +61,26 @@ func start() {
 
 	defer _pipe.Close()
 
+	if _config.AudioBitrate == 0 {
+		_config.AudioBitrate = 128
+	}
+
+	if _config.VideoQualityLevel == 0 {
+		_config.VideoQualityLevel = 25
+	}
+
+	if _config.CPUUsage == "" {
+		_config.CPUUsage = "veryfast"
+	}
+
+	if _config.VideoFramerate == 0 {
+		_config.VideoFramerate = 24
+	}
+
+	audioBitrate := fmt.Sprintf("%dk", _config.AudioBitrate)
+
+	log.Printf("Vadeo is configured to send a %dfps video at a video quality crf of %d with %s audio to %s.", _config.VideoFramerate, _config.VideoQualityLevel, audioBitrate, _config.StreamingURL)
+
 	filter := fmt.Sprintf(`-filter_complex "[0:a]showwaves=mode=cline:s=hd720:colors=White@0.2|Blue@0.3|Black@0.3|Purple@0.3[v]; [1:v][v]overlay[v]; [v]drawbox=y=ih-ih/4:color=black@0.5:width=iw:height=130:t=100, drawtext=fontsize=40:fontcolor=White:fontfile=FreeSerif.ttf:textfile="%s"::y=h-h/4+20:x=20:reload=1, drawtext=fontsize=35:fontcolor=White:fontfile=FreeSerif.ttf:textfile="%s":y=h-h/4+80:x=20:reload=1, format=yuv420p[v]; [v]overlay=x=(main_w-overlay_w-20):y=20,format=rgba,colorchannelmixer=aa=0.5[v]"`, _artistTextFile, _trackTextFile)
 	flags := []string{
 		"ffmpeg",
@@ -73,7 +93,7 @@ func start() {
 		"-re",
 		"-thread_queue_size", "9999",
 		"-stream_loop", "-1",
-		"-r", "24",
+		"-r", fmt.Sprintf("%d", _config.VideoFramerate),
 		"-i background.mp4",
 
 		"-i logo.png",
@@ -81,12 +101,13 @@ func start() {
 		"-map", "[v]",
 		"-map", "0:a:0",
 		"-c:v", "libx264",
-		"-preset", "veryfast",
+		"-preset", _config.CPUUsage,
 		"-profile:v", "high",
 		"-pix_fmt", "yuv420p",
+		"-tune", "zerolatency",
 		"-g", "30",
-		"-crf", "25",
-		"-c:a", "aac", "-b:a", "128k", "-ar", "44100",
+		"-crf", fmt.Sprintf("%d", _config.VideoQualityLevel),
+		"-c:a", "aac", "-b:a", audioBitrate, "-ar", "44100",
 		"-threads", "0",
 		"-f", "flv",
 		rtmpDestination.String(),
@@ -155,7 +176,7 @@ func stationMetadataChanged(m *shoutcast.Metadata) {
 		go func() {
 			// A bit of a hack to offset the fact that the video stream
 			// will be multiple seconds behind.
-			time.Sleep(5 * time.Second)
+			time.Sleep(8 * time.Second)
 			owncast.SetStreamTitle(m.StreamTitle)
 		}()
 	}

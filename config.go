@@ -14,6 +14,12 @@ const (
 type Config struct {
 	AudioURL string `yaml:"audioUrl"`
 
+	AudioBitrate      int    `yaml:"audioBitrate"`
+	VideoQualityLevel int    `yaml:"videoQualityLevel"`
+	CPUUsage          string `yaml:"cpuUsage"`
+
+	VideoFramerate int `yaml:"framerate"`
+
 	StreamingURL string `yaml:"streamingURL"`
 	StreamingKey string `yaml:"streamingKey"`
 

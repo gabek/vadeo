@@ -1,6 +1,7 @@
 package shoutcast
 
 import (
+	"log"
 	"strings"
 )
 
@@ -14,6 +15,7 @@ func NewMetadata(b []byte) *Metadata {
 	m := &Metadata{}
 
 	props := strings.Split(string(b), ";")
+	log.Print("[DEBUG] Received metadata: ", props)
 
 	for _, prop := range props {
 		if prop == "" {

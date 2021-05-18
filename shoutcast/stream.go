@@ -3,16 +3,38 @@ package shoutcast
 import (
 	"fmt"
 	"io"
+	"log"
 	"net"
 	"net/http"
 	"strconv"
-	"time"
 )
+
+type IcyConnWrapper struct {
+	net.Conn
+	haveReadAny bool
+}
+
+func (i *IcyConnWrapper) Read(b []byte) (int, error) {
+	if i.haveReadAny {
+		return i.Conn.Read(b)
+	}
+	i.haveReadAny = true
+	//bounds checking ommitted. There are a few ways this can go wrong.
+	//always check array sizes and returned n.
+	n, err := i.Conn.Read(b[:3])
+	if err != nil {
+		return n, err
+	}
+	if string(b[:3]) == "ICY" {
+		//write Correct http response into buffer
+		copy(b, []byte("HTTP/1.1"))
+		return 8, nil
+	}
+	return n, nil
+}
 
 // MetadataCallbackFunc is the type of the function called when the stream metadata changes
 type MetadataCallbackFunc func(m *Metadata)
-
-type BytesCallbackFunc func(b []byte)
 
 // Stream represents an open shoutcast stream.
 type Stream struct {
@@ -49,16 +71,22 @@ type Stream struct {
 
 // Open establishes a connection to a remote server.
 func Open(url string) (*Stream, error) {
+	// log.Print("[INFO] Opening ", url)
+
 	req, err := http.NewRequest("GET", url, nil)
 	req.Header.Add("accept", "*/*")
 	req.Header.Add("user-agent", "iTunes/12.9.2 (Macintosh; OS X 10.14.3) AppleWebKit/606.4.5")
 	req.Header.Add("icy-metadata", "1")
 
-	// Timeout for establishing the connection.
-	// We don't want for the stream to timeout while we're reading it, but
-	// we do want a timeout for establishing the connection to the server.
-	dialer := &net.Dialer{Timeout: 5 * time.Second}
-	transport := &http.Transport{Dial: dialer.Dial}
+	transport := &http.Transport{
+		Dial: func(network, a string) (net.Conn, error) {
+			realConn, err := net.Dial(network, a)
+			if err != nil {
+				return nil, err
+			}
+			return &IcyConnWrapper{Conn: realConn}, nil
+		},
+	}
 	client := &http.Client{Transport: transport}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -108,7 +136,6 @@ func (s *Stream) Read(buf []byte) (dataLen int, err error) {
 		skip, e := s.extractMetadata(buf[checkedDataLen+offset:])
 		if e != nil {
 			err = e
-			fmt.Println(err)
 		}
 		s.pos = 0
 		if offset+skip > uncheckedDataLen {
@@ -128,6 +155,7 @@ func (s *Stream) Read(buf []byte) (dataLen int, err error) {
 
 // Close closes the stream
 func (s *Stream) Close() error {
+	log.Print("[INFO] Closing ", s.URL)
 	return s.rc.Close()
 }
 

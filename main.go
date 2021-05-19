@@ -81,7 +81,7 @@ func start() {
 
 	log.Printf("Vadeo is configured to send a %dfps video at a video quality crf of %d with %s audio to %s.", _config.VideoFramerate, _config.VideoQualityLevel, audioBitrate, _config.StreamingURL)
 
-	filter := fmt.Sprintf(`-filter_complex "[0:a]showwaves=mode=cline:s=hd720:colors=White@0.2|Blue@0.3|Black@0.3|Purple@0.3[v]; [1:v][v]overlay[v]; [v]drawbox=y=ih-ih/4:color=black@0.5:width=iw:height=130:t=100, drawtext=fontsize=40:fontcolor=White:fontfile=FreeSerif.ttf:textfile="%s"::y=h-h/4+20:x=20:reload=1, drawtext=fontsize=35:fontcolor=White:fontfile=FreeSerif.ttf:textfile="%s":y=h-h/4+80:x=20:reload=1, format=yuv420p[v]; [v]overlay=x=(main_w-overlay_w-20):y=20,format=rgba,colorchannelmixer=aa=0.5[v]"`, _artistTextFile, _trackTextFile)
+	filter := fmt.Sprintf(`-filter_complex "[0:a]showwaves=mode=cline:s=hd720:colors=White@0.2|Blue@0.3|Black@0.3|Purple@0.3[v]; [1:v][v]overlay[v]; [v]drawbox=y=ih-ih/4:color=black@0.5:width=iw:height=130:t=100, drawtext=fontsize=40:fontcolor=White:fontfile=FreeSerif.ttf:textfile="%s"::y=h-h/4+20:x=20:reload=1, drawtext=fontsize=35:fontcolor=White:fontfile=FreeSerif.ttf:textfile="%s":y=h-h/4+80:x=20:reload=1, format=yuv420p[v]; [v]overlay=x=(main_w-overlay_w-20):y=20,format=rgba,colorchannelmixer=aa=0.5[v]; [v]setpts=PTS-STARTPTS[v]"`, _artistTextFile, _trackTextFile)
 	flags := []string{
 		"ffmpeg",
 		"-y",
@@ -91,15 +91,18 @@ func start() {
 		"-f", "mp3", "-i", _audioPipeFile,
 
 		"-re",
+		// "-use_wallclock_as_timestamps", "1",
 		"-thread_queue_size", "9999",
 		"-stream_loop", "-1",
 		"-r", fmt.Sprintf("%d", _config.VideoFramerate),
+		// "-use_wallclock_as_timestamps", "1",
 		"-i background.mp4",
 
 		"-i logo.png",
 		filter,
 		"-map", "[v]",
 		"-map", "0:a:0",
+		"-fflags", "+genpts",
 		"-c:v", "libx264",
 		"-preset", _config.CPUUsage,
 		"-profile:v", "high",
@@ -176,8 +179,8 @@ func stationMetadataChanged(m *shoutcast.Metadata) {
 		go func() {
 			// A bit of a hack to offset the fact that the video stream
 			// will be multiple seconds behind.
-			time.Sleep(8 * time.Second)
-			owncast.SetStreamTitle(m.StreamTitle)
+			time.Sleep(10 * time.Second)
+			owncast.SetStreamTitle("Now Playing: " + m.StreamTitle)
 		}()
 	}
 }

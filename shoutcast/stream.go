@@ -128,7 +128,9 @@ func Open(url string) (*Stream, error) {
 // Read implements the standard Read interface
 func (s *Stream) Read(buf []byte) (dataLen int, err error) {
 	dataLen, err = s.rc.Read(buf)
-
+	if err != nil {
+		panic(err)
+	}
 	checkedDataLen := 0
 	uncheckedDataLen := dataLen
 	for s.pos+uncheckedDataLen > s.metaint {
@@ -136,6 +138,8 @@ func (s *Stream) Read(buf []byte) (dataLen int, err error) {
 		skip, e := s.extractMetadata(buf[checkedDataLen+offset:])
 		if e != nil {
 			err = e
+			fmt.Println(e)
+			panic(e)
 		}
 		s.pos = 0
 		if offset+skip > uncheckedDataLen {
@@ -160,6 +164,8 @@ func (s *Stream) Close() error {
 }
 
 func (s *Stream) extractMetadata(p []byte) (int, error) {
+	// fmt.Println(string(p))
+
 	var metabuf []byte
 	var err error
 	length := int(p[0]) * 16
@@ -181,6 +187,8 @@ func (s *Stream) extractMetadata(p []byte) (int, error) {
 				complete = true
 			} else if err == nil || err == io.EOF {
 				err = io.ErrUnexpectedEOF
+				s.pos = 0
+				return 0, err
 			}
 		} else {
 			metabuf = p[1:end]

@@ -75,7 +75,7 @@ func Open(url string) (*Stream, error) {
 
 	req, err := http.NewRequest("GET", url, nil)
 	req.Header.Add("accept", "*/*")
-	req.Header.Add("user-agent", "iTunes/12.9.2 (Macintosh; OS X 10.14.3) AppleWebKit/606.4.5")
+	// req.Header.Add("user-agent", "iTunes/12.9.2 (Macintosh; OS X 10.14.3) AppleWebKit/606.4.5")
 	req.Header.Add("icy-metadata", "1")
 
 	transport := &http.Transport{
@@ -109,6 +109,8 @@ func Open(url string) (*Stream, error) {
 	if err != nil {
 		return nil, fmt.Errorf("cannot parse metaint: %v", err)
 	}
+
+	fmt.Println("metaint", metaint)
 
 	s := &Stream{
 		Name:        resp.Header.Get("icy-name"),
@@ -192,6 +194,8 @@ func (s *Stream) extractMetadata(p []byte) (int, error) {
 			}
 		} else {
 			metabuf = p[1:end]
+			// fmt.Println(string(p))
+			fmt.Println(string(metabuf))
 			complete = true
 		}
 	}

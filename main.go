@@ -14,10 +14,10 @@ import (
 
 	"github.com/gabek/vadeo/owncast"
 	shoutcast "github.com/gabek/vadeo/shoutcast"
+	mp3 "github.com/hajimehoshi/go-mp3"
 )
 
 const (
-	_audioPipeFile  = "./.pipe.mp3"
 	_artistTextFile = "./.artist.txt"
 	_trackTextFile  = "./.track.txt"
 )
@@ -71,7 +71,7 @@ func start() {
 
 		"-thread_queue_size", "9999",
 		"-re",
-		"-f", "mp3", "-i", "pipe:", //_audioPipeFile,
+		"-f", "s32le", "-i", "pipe:", //_audioPipeFile,
 
 		"-re",
 		// "-use_wallclock_as_timestamps", "1",
@@ -140,10 +140,13 @@ func connectToStation() {
 
 	stream.MetadataCallbackFunc = stationMetadataChanged
 
-	// go func() {
-	_, err = io.Copy(stdin, stream)
+	decoder, err := mp3.NewDecoder(stream)
 	if err != nil {
-		panic(fmt.Errorf("unable to write to %s: %s", _audioPipeFile, err))
+		panic(err)
+	}
+	// go func() {
+	if _, err = io.Copy(stdin, decoder); err != nil {
+		panic(fmt.Errorf("unable to write audio: %s", err))
 	}
 	// }()
 }

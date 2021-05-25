@@ -17,7 +17,6 @@ import (
 )
 
 const (
-	_audioPipeFile  = "./.pipe.mp3"
 	_artistTextFile = "./.artist.txt"
 	_trackTextFile  = "./.track.txt"
 )
@@ -69,9 +68,9 @@ func start() {
 	flags := []string{
 		"-y",
 
-		"-thread_queue_size", "9999",
+		// "-thread_queue_size", "9999",
 		"-re",
-		"-f", "mp3", "-i", "pipe:", //_audioPipeFile,
+		"-f", "mp3", "-i", "pipe:",
 
 		"-re",
 		// "-use_wallclock_as_timestamps", "1",
@@ -91,7 +90,7 @@ func start() {
 		"-preset", _config.CPUUsage,
 		"-profile:v", "high",
 		"-pix_fmt", "yuv420p",
-		"-tune", "zerolatency",
+		// "-tune", "zerolatency",
 		"-g", "30",
 		"-crf", fmt.Sprintf("%d", _config.VideoQualityLevel),
 		"-c:a", "aac", "-b:a", audioBitrate, "-ar", "44100",
@@ -143,7 +142,7 @@ func connectToStation() {
 	// go func() {
 	_, err = io.Copy(stdin, stream)
 	if err != nil {
-		panic(fmt.Errorf("unable to write to %s: %s", _audioPipeFile, err))
+		panic(fmt.Errorf("unable to write to stdin", err))
 	}
 	// }()
 }

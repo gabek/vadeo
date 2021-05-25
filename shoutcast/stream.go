@@ -71,11 +71,11 @@ type Stream struct {
 
 // Open establishes a connection to a remote server.
 func Open(url string) (*Stream, error) {
-	// log.Print("[INFO] Opening ", url)
+	log.Print("[INFO] Opening ", url)
 
 	req, err := http.NewRequest("GET", url, nil)
 	req.Header.Add("accept", "*/*")
-	// req.Header.Add("user-agent", "iTunes/12.9.2 (Macintosh; OS X 10.14.3) AppleWebKit/606.4.5")
+	req.Header.Add("user-agent", "speakergeek")
 	req.Header.Add("icy-metadata", "1")
 
 	transport := &http.Transport{
@@ -93,9 +93,9 @@ func Open(url string) (*Stream, error) {
 		return nil, err
 	}
 
-	// for k, v := range resp.Header {
-	// 	log.Print("[DEBUG] HTTP header ", k, ": ", v[0])
-	// }
+	for k, v := range resp.Header {
+		log.Print("[DEBUG] HTTP header ", k, ": ", v[0])
+	}
 
 	var bitrate int
 	if rawBitrate := resp.Header.Get("icy-br"); rawBitrate != "" {
@@ -109,8 +109,6 @@ func Open(url string) (*Stream, error) {
 	if err != nil {
 		return nil, fmt.Errorf("cannot parse metaint: %v", err)
 	}
-
-	fmt.Println("metaint", metaint)
 
 	s := &Stream{
 		Name:        resp.Header.Get("icy-name"),
@@ -130,9 +128,7 @@ func Open(url string) (*Stream, error) {
 // Read implements the standard Read interface
 func (s *Stream) Read(buf []byte) (dataLen int, err error) {
 	dataLen, err = s.rc.Read(buf)
-	if err != nil {
-		panic(err)
-	}
+
 	checkedDataLen := 0
 	uncheckedDataLen := dataLen
 	for s.pos+uncheckedDataLen > s.metaint {
@@ -140,8 +136,6 @@ func (s *Stream) Read(buf []byte) (dataLen int, err error) {
 		skip, e := s.extractMetadata(buf[checkedDataLen+offset:])
 		if e != nil {
 			err = e
-			fmt.Println(e)
-			panic(e)
 		}
 		s.pos = 0
 		if offset+skip > uncheckedDataLen {
@@ -166,19 +160,22 @@ func (s *Stream) Close() error {
 }
 
 func (s *Stream) extractMetadata(p []byte) (int, error) {
-	// fmt.Println(string(p))
-
 	var metabuf []byte
 	var err error
+
+	// How many bytes long is the metadata block.
 	length := int(p[0]) * 16
 	end := length + 1
 	complete := false
 	if length > 0 {
+		log.Println(length)
+
 		if len(p) < end {
 			// The provided buffer was not large enough for the metadata block to fit in.
 			// Read whole metadata into our own buffer.
 			metabuf = make([]byte, length)
 			copy(metabuf, p[1:])
+
 			n := len(p) - 1
 			for n < length && err == nil {
 				var nn int
@@ -189,13 +186,10 @@ func (s *Stream) extractMetadata(p []byte) (int, error) {
 				complete = true
 			} else if err == nil || err == io.EOF {
 				err = io.ErrUnexpectedEOF
-				s.pos = 0
-				return 0, err
 			}
 		} else {
 			metabuf = p[1:end]
-			// fmt.Println(string(p))
-			fmt.Println(string(metabuf))
+			log.Println(string(metabuf))
 			complete = true
 		}
 	}

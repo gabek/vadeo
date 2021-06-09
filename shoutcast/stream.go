@@ -126,7 +126,9 @@ func Open(url string) (*Stream, error) {
 }
 
 // Read implements the standard Read interface
-func (s *Stream) Read(buf []byte) (dataLen int, err error) {
+func (s *Stream) Read(origbuf []byte) (dataLen int, err error) {
+	buf := origbuf
+
 	dataLen, err = s.rc.Read(buf)
 
 	checkedDataLen := 0
@@ -165,6 +167,11 @@ func (s *Stream) extractMetadata(p []byte) (int, error) {
 
 	// How many bytes long is the metadata block.
 	length := int(p[0]) * 16
+	if length > 16*8 {
+		fmt.Println("ErrUnexpectedEOF")
+		return 0, io.ErrUnexpectedEOF
+	}
+
 	end := length + 1
 	complete := false
 	if length > 0 {

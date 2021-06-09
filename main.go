@@ -139,12 +139,10 @@ func connectToStation() {
 
 	stream.MetadataCallbackFunc = stationMetadataChanged
 
-	// go func() {
 	_, err = io.Copy(stdin, stream)
 	if err != nil {
 		panic(fmt.Errorf("unable to write to stdin", err))
 	}
-	// }()
 }
 
 func stationMetadataChanged(m *shoutcast.Metadata) {

@@ -29,6 +29,10 @@ var _stationDescription = ""
 
 func main() {
 	setup()
+	restart()
+}
+
+func restart() {
 	go connectToStation()
 	start()
 }
@@ -115,14 +119,14 @@ func start() {
 	err = cmd.Run()
 	if err != nil {
 		fmt.Println(fmt.Sprint(err) + ": " + stderr.String())
-
-		panic(err)
-		panic("Error starting ffmpeg.  Are you sure it's installed?")
+		log.Println("Error starting ffmpeg.  Are you sure it's installed?", err.Error())
+		time.Sleep(10 * time.Second)
+		restart()
 	}
+
 	err = cmd.Wait()
 	if err != nil {
-		panic(err)
-		panic("Error streaming video.  Is your destination and key correct?  Check log.txt for troubleshooting.")
+		log.Fatalln("Error streaming video.  Is your destination and key correct?  Check log.txt for troubleshooting.", err.Error())
 	}
 }
 
@@ -141,7 +145,13 @@ func connectToStation() {
 
 	_, err = io.Copy(stdin, stream)
 	if err != nil {
-		panic(fmt.Errorf("unable to write to stdin", err))
+		log.Println(fmt.Errorf("unable to write to stdin", err))
+		stdin.Close()
+		stream.Close()
+		time.Sleep(5 * time.Second)
+		restart()
+
+		return
 	}
 }
 

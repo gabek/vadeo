@@ -7,8 +7,10 @@ import (
 	"io/ioutil"
 	"log"
 	"net/url"
+	"os"
 	"os/exec"
 	"path"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -16,16 +18,16 @@ import (
 	shoutcast "github.com/gabek/vadeo/shoutcast"
 )
 
-const (
-	_artistTextFile = "./.artist.txt"
-	_trackTextFile  = "./.track.txt"
+var (
+	_artistTextFile = filepath.Join(os.TempDir(), "vadio-artist")
+	_trackTextFile  = filepath.Join(os.TempDir(), "vadio-track")
+
+	_config = loadConfig()
+	stdin   io.WriteCloser
+
+	_stationTitle       = ""
+	_stationDescription = ""
 )
-
-var _config = loadConfig()
-var stdin io.WriteCloser
-
-var _stationTitle = ""
-var _stationDescription = ""
 
 func main() {
 	setup()
@@ -72,21 +74,17 @@ func start() {
 	flags := []string{
 		"-y",
 
-		// "-thread_queue_size", "9999",
 		"-re",
 		"-f", "mp3", "-i", "pipe:",
 
 		"-re",
-		// "-use_wallclock_as_timestamps", "1",
 		"-thread_queue_size", "9999",
 		"-stream_loop", "-1",
 		"-r", fmt.Sprintf("%d", _config.VideoFramerate),
-		// "-use_wallclock_as_timestamps", "1",
 		"-i", "background.mp4",
 
 		"-i", "logo.png",
 		"-filter_complex", filter,
-		// filter,
 		"-map", "[v]",
 		"-map", "0:a:0",
 		"-fflags", "+genpts",
@@ -94,7 +92,6 @@ func start() {
 		"-preset", _config.CPUUsage,
 		"-profile:v", "high",
 		"-pix_fmt", "yuv420p",
-		// "-tune", "zerolatency",
 		"-g", "30",
 		"-crf", fmt.Sprintf("%d", _config.VideoQualityLevel),
 		"-c:a", "aac", "-b:a", audioBitrate, "-ar", "44100",
@@ -173,15 +170,24 @@ func stationMetadataChanged(m *shoutcast.Metadata) {
 		track = _stationTitle
 	}
 
-	ioutil.WriteFile(_artistTextFile, []byte(artist), 0644)
-	ioutil.WriteFile(_trackTextFile, []byte(track), 0644)
+	if err := ioutil.WriteFile(_artistTextFile, []byte(artist), 0644); err != nil {
+		log.Println(err)
+		return
+	}
+
+	if err := ioutil.WriteFile(_trackTextFile, []byte(track), 0644); err != nil {
+		log.Println(err)
+		return
+	}
 
 	if _config.OwncastAccessToken != "" {
 		go func() {
 			// A bit of a hack to offset the fact that the video stream
 			// will be multiple seconds behind.
 			time.Sleep(10 * time.Second)
-			owncast.SetStreamTitle("Now Playing: " + m.StreamTitle)
+			if err := owncast.SetStreamTitle("Now Playing: " + m.StreamTitle); err != nil {
+				log.Println(err)
+			}
 		}()
 	}
 }

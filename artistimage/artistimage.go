@@ -1,10 +1,7 @@
 package artistimage
 
 import (
-	"bytes"
 	"fmt"
-	"image"
-	"image/jpeg"
 	"io"
 	"log"
 	"net/http"
@@ -12,12 +9,10 @@ import (
 	"strings"
 
 	"github.com/gocolly/colly"
-	"github.com/nfnt/resize"
 )
 
 const (
-	userAgent   = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36"
-	imageHeight = 150
+	userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36"
 )
 
 func GetArtistImage(artistName string) ([]byte, error) {
@@ -42,14 +37,9 @@ func GetArtistImage(artistName string) ([]byte, error) {
 		return nil, err
 	}
 
-	resizedImage, err := resizeImage(imageData, imageHeight)
-	if err != nil {
-		return nil, err
-	}
+	setCachedImage(normalizedArtistName, imageData)
 
-	setCachedImage(normalizedArtistName, resizedImage)
-
-	return resizedImage, nil
+	return imageData, nil
 }
 
 func getImageDataAtURL(imageURL string) ([]byte, error) {
@@ -111,18 +101,4 @@ func getImageURLAtHTMLURL(imageHtmlPageURL string) (string, error) {
 	}
 
 	return imageURL, nil
-}
-
-func resizeImage(imageData []byte, height uint) ([]byte, error) {
-	originalImage, _, err := image.Decode(bytes.NewReader(imageData))
-	if err != nil {
-		return nil, err
-	}
-
-	newImage := resize.Resize(0, height, originalImage, resize.Lanczos3)
-
-	// Encode uses a Writer, use a Buffer if you need the raw []byte
-	var result bytes.Buffer
-	err = jpeg.Encode(&result, newImage, nil)
-	return result.Bytes(), err
 }

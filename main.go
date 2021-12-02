@@ -101,9 +101,9 @@ func start() {
 		`[2:v]format=rgba,colorchannelmixer=aa=0.9[logo]`,
 		`[v][logo]overlay=x=(main_w-overlay_w-20):y=20[v]`,
 
-		// Artist image
-		`[3:v]format=rgba,colorchannelmixer=aa=0.7[artistimage]`,
-		`[v][artistimage]overlay=x=20:y=20[v]`,
+		// Artist image is scaled down and made into a square.
+		`[3:v]scale=110:110,setsar=1:1,crop=110:110[artistimage]`,
+		`[v][artistimage]overlay=x=(main_w-overlay_w-25):y=(main_h-main_h/4+10)[v]`,
 	}
 	filter := `-filter_complex "` + strings.Join(filters, "; ") + `"`
 

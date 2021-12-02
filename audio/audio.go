@@ -14,6 +14,8 @@ type AudioStream struct {
 	Description string
 }
 
+// Connect will connect to an audio stream and return a handle to the stream
+// and additional metadata.
 func Connect(url string) (AudioStream, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {

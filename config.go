@@ -26,7 +26,8 @@ type Config struct {
 	OwncastServerURL   string `yaml:"owncastServerURL"`
 	OwncastAccessToken string `yaml:"owncastAccessToken"`
 
-	UseArtistImage bool `yaml:"useArtistImage"`
+	UseArtistImage     bool `yaml:"useArtistImage"`
+	UseAudioVisualizer bool `yaml:"useAudioVisualizer"`
 
 	FontFile       string `yaml:"fontFile"`
 	ArtistFontSize int    `yaml:"artistFontSize"`

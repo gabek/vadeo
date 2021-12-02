@@ -95,13 +95,13 @@ func start() {
 		artistImage = `[3:v]scale=110:110,setsar=1:1,crop=110:110[artistimage]; [v][artistimage]overlay=x=(main_w-overlay_w-25):y=(main_h-main_h/4+10)[v]`
 	}
 
+	startingInput := "v"
+	if !_config.UseAudioVisualizer {
+		startingInput = "1:v"
+	}
 	filters := []string{
-		// Audio visualizer
-		`[0:a]showwaves=mode=cline:s=hd720:colors=White@0.2|Blue@0.3|Black@0.3|Purple@0.3[v]`,
-		`[1:v][v]overlay[v]`,
-
 		// Overlay box
-		`[v]drawbox=y=ih-ih/4:color=black@0.5:width=iw:height=130:t=100[v]`,
+		fmt.Sprintf(`[%s]drawbox=y=ih-ih/4:color=black@0.5:width=iw:height=130:t=100[v]`, startingInput),
 
 		// Artist & track text
 		fmt.Sprintf(`[v]drawtext=fontsize=%d:fontcolor=White:fontfile="%s":textfile="%s":y=h-h/4+20:x=20:reload=1, drawtext=fontsize=%d:fontcolor=White:fontfile="%s":textfile="%s":y=h-h/4+80:x=20:reload=1, format=yuv420p[v]`, _config.ArtistFontSize, _config.FontFile, _artistTextFile, _config.TrackFontSize, _config.FontFile, _trackTextFile),
@@ -113,6 +113,10 @@ func start() {
 	if _config.UseArtistImage {
 		filters = append(filters, artistImage)
 	}
+	if _config.UseAudioVisualizer {
+		filters = append([]string{`[0:a]showwaves=mode=cline:s=hd720:colors=White@0.2|Blue@0.3|Black@0.3|Purple@0.3[v]; [1:v][v]overlay[v]`}, filters...)
+	}
+
 	filter := `-filter_complex "` + strings.Join(filters, "; ") + `"`
 
 	var artistImageInput string

@@ -1,7 +1,6 @@
 package artistimage
 
 import (
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -70,11 +69,6 @@ func getImagesURLForArtist(artist string) (string, error) {
 	c.OnHTML(imagesLocation, func(e *colly.HTMLElement) {
 		u := "https://www.last.fm" + e.Attr("href")
 		imagesURL = u
-	})
-
-	// Before making a request print "Visiting ..."
-	c.OnRequest(func(r *colly.Request) {
-		fmt.Println("Visiting", r.URL.String())
 	})
 
 	if err := c.Visit(u); err != nil {

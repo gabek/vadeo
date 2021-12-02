@@ -89,6 +89,12 @@ func start() {
 
 	go streamAudio(pw)
 
+	var artistImage string
+	if _config.UseArtistImage {
+		// Artist image is scaled down and made into a square.
+		artistImage = `[3:v]scale=110:110,setsar=1:1,crop=110:110[artistimage]; [v][artistimage]overlay=x=(main_w-overlay_w-25):y=(main_h-main_h/4+10)[v]`
+	}
+
 	filters := []string{
 		// Audio visualizer
 		`[0:a]showwaves=mode=cline:s=hd720:colors=White@0.2|Blue@0.3|Black@0.3|Purple@0.3[v]`,
@@ -103,12 +109,21 @@ func start() {
 		// Logo
 		`[2:v]format=rgba,colorchannelmixer=aa=0.9[logo]`,
 		`[v][logo]overlay=x=(main_w-overlay_w-20):y=20[v]`,
-
-		// Artist image is scaled down and made into a square.
-		`[3:v]scale=110:110,setsar=1:1,crop=110:110[artistimage]`,
-		`[v][artistimage]overlay=x=(main_w-overlay_w-25):y=(main_h-main_h/4+10)[v]`,
+	}
+	if _config.UseArtistImage {
+		filters = append(filters, artistImage)
 	}
 	filter := `-filter_complex "` + strings.Join(filters, "; ") + `"`
+
+	var artistImageInput string
+	if _config.UseArtistImage {
+		artistImageInput = strings.Join([]string{
+			"-stream_loop -1",
+			"-re",
+			"-f image2",
+			"-i ", _artistImageFile,
+		}, " ")
+	}
 
 	flags := []string{
 		"ffmpeg",
@@ -134,10 +149,7 @@ func start() {
 		"-i logo.png",
 
 		// Artist image
-		"-stream_loop -1",
-		"-re",
-		"-f image2",
-		"-i ", _artistImageFile,
+		artistImageInput,
 
 		// Visualization and overlays
 		filter,
@@ -249,13 +261,15 @@ func stationMetadataChanged(nowPlaying string) {
 		return
 	}
 
-	imageData, err := artistimage.GetArtistImage(artist)
-	if err != nil {
-		log.Println("unable to download artist image", err)
-	}
+	if _config.UseArtistImage {
+		imageData, err := artistimage.GetArtistImage(artist)
+		if err != nil {
+			log.Println("unable to download artist image", err)
+		}
 
-	if err := ioutil.WriteFile(_artistImageFile, imageData, 0644); err != nil {
-		log.Println("unable to write artist image file:", err)
-		return
+		if err := ioutil.WriteFile(_artistImageFile, imageData, 0644); err != nil {
+			log.Println("unable to write artist image file:", err)
+			return
+		}
 	}
 }

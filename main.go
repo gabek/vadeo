@@ -13,6 +13,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gabek/vadeo/artistimage"
 	"github.com/gabek/vadeo/audio"
 	"github.com/gabek/vadeo/metadata"
 	"github.com/gabek/vadeo/owncast"
@@ -25,8 +26,9 @@ const (
 var (
 	_config = loadConfig()
 
-	_artistTextFile = filepath.Join(os.TempDir(), "vadio-artist")
-	_trackTextFile  = filepath.Join(os.TempDir(), "vadio-track")
+	_artistTextFile  = filepath.Join(os.TempDir(), "vadio-artist")
+	_trackTextFile   = filepath.Join(os.TempDir(), "vadio-track")
+	_artistImageFile = filepath.Join(os.TempDir(), "vadio-artist-image")
 
 	_stationDescription = ""
 	_stationTitle       = ""
@@ -87,7 +89,24 @@ func start() {
 
 	go streamAudio(pw)
 
-	filter := fmt.Sprintf(`-filter_complex "[0:a]showwaves=mode=cline:s=hd720:colors=White@0.2|Blue@0.3|Black@0.3|Purple@0.3[v]; [1:v][v]overlay[v]; [v]drawbox=y=ih-ih/4:color=black@0.5:width=iw:height=130:t=100, drawtext=fontsize=40:fontcolor=White:fontfile=FreeSerif.ttf:textfile="%s"::y=h-h/4+20:x=20:reload=1, drawtext=fontsize=35:fontcolor=White:fontfile=FreeSerif.ttf:textfile="%s":y=h-h/4+80:x=20:reload=1, format=yuv420p[v]; [v]overlay=x=(main_w-overlay_w-20):y=20,format=rgba,colorchannelmixer=aa=0.5[v]"`, _artistTextFile, _trackTextFile)
+	filters := []string{
+		// Audio visualizer
+		`[0:a]showwaves=mode=cline:s=hd720:colors=White@0.2|Blue@0.3|Black@0.3|Purple@0.3[v]`,
+		`[1:v][v]overlay[v]`,
+
+		// Overlay box + text
+		fmt.Sprintf(`[v]drawbox=y=ih-ih/4:color=black@0.5:width=iw:height=130:t=100, drawtext=fontsize=40:fontcolor=White:fontfile=FreeSerif.ttf:textfile="%s"::y=h-h/4+20:x=20:reload=1, drawtext=fontsize=35:fontcolor=White:fontfile=FreeSerif.ttf:textfile="%s":y=h-h/4+80:x=20:reload=1, format=yuv420p[v]`, _artistTextFile, _trackTextFile),
+
+		// Logo
+		`[2:v]format=rgba,colorchannelmixer=aa=0.9[logo]`,
+		`[v][logo]overlay=x=(main_w-overlay_w-20):y=20[v]`,
+
+		// Artist image
+		`[3:v]format=rgba,colorchannelmixer=aa=0.7[artistimage]`,
+		`[v][artistimage]overlay=x=20:y=20[v]`,
+	}
+	filter := `-filter_complex "` + strings.Join(filters, "; ") + `"`
+
 	flags := []string{
 		"ffmpeg",
 		"-y",
@@ -106,9 +125,18 @@ func start() {
 		"-i background.mp4",
 
 		// Logo
+		"-stream_loop -1",
+		"-re",
+		"-f image2",
 		"-i logo.png",
 
-		// Visualization and text overlays
+		// Artist image
+		"-stream_loop -1",
+		"-re",
+		"-f image2",
+		"-i ", _artistImageFile,
+
+		// Visualization and overlays
 		filter,
 		"-map", "[v]",
 
@@ -118,11 +146,10 @@ func start() {
 		"-preset", _config.CPUUsage,
 		"-profile:v", "high",
 		"-pix_fmt", "yuv420p",
-		"-tune", "zerolatency",
 		"-g", "30",
 		"-crf", fmt.Sprintf("%d", _config.VideoQualityLevel),
 		"-c:a", "aac", "-b:a", audioBitrate, "-ar", "44100",
-		"-threads", "0",
+
 		"-f", "flv",
 		rtmpDestination.String(),
 		"2> log.txt",
@@ -188,6 +215,8 @@ func updateOwncast(nowPlaying string) {
 func stationMetadataChanged(nowPlaying string) {
 	log.Println("Now playing: ", nowPlaying)
 
+	os.Remove(_artistImageFile)
+
 	_currentNowPlaying = nowPlaying
 	components := strings.SplitN(nowPlaying, " - ", 2)
 	artist := ""
@@ -214,6 +243,16 @@ func stationMetadataChanged(nowPlaying string) {
 
 	if err := ioutil.WriteFile(_trackTextFile, []byte(track), 0644); err != nil {
 		log.Println("unable to write track text file:", err)
+		return
+	}
+
+	imageData, err := artistimage.GetArtistImage(artist)
+	if err != nil {
+		log.Println("unable to download artist image", err)
+	}
+
+	if err := ioutil.WriteFile(_artistImageFile, imageData, 0644); err != nil {
+		log.Println("unable to write artist image file:", err)
 		return
 	}
 }

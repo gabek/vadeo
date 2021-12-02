@@ -172,8 +172,22 @@ func fetchNowPlaying() {
 	}
 }
 
+func updateOwncast(nowPlaying string) {
+	if _config.OwncastAccessToken != "" {
+		go func() {
+			// A bit of a hack to offset the fact that the video stream
+			// will be multiple seconds behind.
+			time.Sleep(8 * time.Second)
+			if err := owncast.SetStreamTitle(nowPlaying); err != nil {
+				log.Println(err)
+			}
+		}()
+	}
+}
+
 func stationMetadataChanged(nowPlaying string) {
 	log.Println("Now playing: ", nowPlaying)
+
 	_currentNowPlaying = nowPlaying
 	components := strings.SplitN(nowPlaying, " - ", 2)
 	artist := ""
@@ -191,17 +205,15 @@ func stationMetadataChanged(nowPlaying string) {
 		track = _stationTitle
 	}
 
-	ioutil.WriteFile(_artistTextFile, []byte(artist), 0644)
-	ioutil.WriteFile(_trackTextFile, []byte(track), 0644)
+	go updateOwncast(nowPlaying)
 
-	if _config.OwncastAccessToken != "" {
-		go func() {
-			// A bit of a hack to offset the fact that the video stream
-			// will be multiple seconds behind.
-			time.Sleep(8 * time.Second)
-			if err := owncast.SetStreamTitle(nowPlaying); err != nil {
-				log.Println(err)
-			}
-		}()
+	if err := ioutil.WriteFile(_artistTextFile, []byte(artist), 0644); err != nil {
+		log.Println("unable to write artist text file:", err)
+		return
+	}
+
+	if err := ioutil.WriteFile(_trackTextFile, []byte(track), 0644); err != nil {
+		log.Println("unable to write track text file:", err)
+		return
 	}
 }

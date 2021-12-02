@@ -48,5 +48,33 @@ func loadConfig() Config {
 		return config
 	}
 
+	if config.FontFile == "" {
+		config.FontFile = "FreeSans.ttf"
+	}
+
+	if config.ArtistFontSize == 0 {
+		config.ArtistFontSize = 40
+	}
+
+	if config.TrackFontSize == 0 {
+		config.TrackFontSize = 35
+	}
+
+	if config.AudioBitrate == 0 {
+		config.AudioBitrate = 128
+	}
+
+	if config.CPUUsage == "" {
+		config.CPUUsage = "faster"
+	}
+
+	if config.VideoQualityLevel == 0 {
+		config.VideoQualityLevel = 25
+	}
+
+	if config.VideoFramerate == 0 {
+		config.VideoFramerate = 24
+	}
+
 	return config
 }

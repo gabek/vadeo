@@ -25,6 +25,10 @@ type Config struct {
 
 	OwncastServerURL   string `yaml:"owncastServerURL"`
 	OwncastAccessToken string `yaml:"owncastAccessToken"`
+
+	FontFile       string `yaml:"fontFile"`
+	ArtistFontSize int    `yaml:"artistFontSize"`
+	TrackFontSize  int    `yaml:"trackFontSize"`
 }
 
 func loadConfig() Config {

@@ -94,8 +94,11 @@ func start() {
 		`[0:a]showwaves=mode=cline:s=hd720:colors=White@0.2|Blue@0.3|Black@0.3|Purple@0.3[v]`,
 		`[1:v][v]overlay[v]`,
 
-		// Overlay box + text
-		fmt.Sprintf(`[v]drawbox=y=ih-ih/4:color=black@0.5:width=iw:height=130:t=100, drawtext=fontsize=40:fontcolor=White:fontfile=FreeSerif.ttf:textfile="%s"::y=h-h/4+20:x=20:reload=1, drawtext=fontsize=35:fontcolor=White:fontfile=FreeSerif.ttf:textfile="%s":y=h-h/4+80:x=20:reload=1, format=yuv420p[v]`, _artistTextFile, _trackTextFile),
+		// Overlay box
+		`[v]drawbox=y=ih-ih/4:color=black@0.5:width=iw:height=130:t=100[v]`,
+
+		// Artist & track text
+		fmt.Sprintf(`[v]drawtext=fontsize=%d:fontcolor=White:fontfile="%s":textfile="%s":y=h-h/4+20:x=20:reload=1, drawtext=fontsize=%d:fontcolor=White:fontfile="%s":textfile="%s":y=h-h/4+80:x=20:reload=1, format=yuv420p[v]`, _config.ArtistFontSize, _config.FontFile, _artistTextFile, _config.TrackFontSize, _config.FontFile, _trackTextFile),
 
 		// Logo
 		`[2:v]format=rgba,colorchannelmixer=aa=0.9[logo]`,

@@ -28,7 +28,9 @@ framerate: 24
 # Faster is less CPU use, larger video size, and lower quality.
 # Slower is more CPU use, smaller video sizes, and higher quality.
 # I don't recommend anything outside of "faster" and "fast".
-cpuUsage: faster
+# From fastest (lowest quality) to slowest (highest quality):
+# ultrafast, superfast, veryfast, faster
+cpuUsage: superfast
 
 # Optional Owncast integration for v0.0.6+.
 # Read more at https://owncast.online/thirdparty/apis

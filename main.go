@@ -75,8 +75,8 @@ func start() {
 
 	var artistImage string
 	if _config.UseArtistImage {
-		// Artist image is scaled down and made into a square.
-		artistImage = `[3:v]scale=-1:110[artistimage]; [v][artistimage]overlay=x=(main_w-overlay_w-25):y=(main_h-main_h/4+10)[v]`
+		// Artist image position.
+		artistImage = `[v][3:v]overlay=x=(main_w-overlay_w-25):y=(main_h-main_h/4+10)[v]`
 	}
 
 	startingInput := "v"
@@ -91,8 +91,7 @@ func start() {
 		fmt.Sprintf(`[v]drawtext=fontsize=%d:fontcolor=White:fontfile="%s":textfile="%s":y=h-h/4+20:x=20:reload=1, drawtext=fontsize=%d:fontcolor=White:fontfile="%s":textfile="%s":y=h-h/4+80:x=20:reload=1, format=yuv420p[v]`, _config.ArtistFontSize, _config.FontFile, _artistTextFile, _config.TrackFontSize, _config.FontFile, _trackTextFile),
 
 		// Logo
-		`[2:v]format=rgba,colorchannelmixer=aa=0.9[logo]`,
-		`[v][logo]overlay=x=(main_w-overlay_w-20):y=20[v]`,
+		`[v][2:v]overlay=x=(main_w-overlay_w-20):y=20[v]`,
 	}
 	if _config.UseArtistImage {
 		filters = append(filters, artistImage)
@@ -116,7 +115,7 @@ func start() {
 	flags := []string{
 		"ffmpeg",
 		"-y",
-
+		"-threads", "0",
 		"-thread_queue_size", "9999",
 
 		// MP3 stream
@@ -127,7 +126,6 @@ func start() {
 		"-re",
 		"-thread_queue_size", "9999",
 		"-stream_loop", "-1",
-		"-r", fmt.Sprintf("%d", _config.VideoFramerate),
 		"-i background.mp4",
 
 		// Logo

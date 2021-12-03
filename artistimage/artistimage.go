@@ -4,13 +4,16 @@ import (
 	"bytes"
 	"fmt"
 	"image"
+	"image/jpeg"
 	_ "image/jpeg"
 	"image/png"
+	_ "image/png"
 	"log"
 	"net/http"
 	"net/url"
 	"strings"
 
+	"github.com/disintegration/imaging"
 	"github.com/gocolly/colly"
 )
 
@@ -59,13 +62,15 @@ func getImageDataAtURL(imageURL string) ([]byte, error) {
 	}
 	defer resp.Body.Close()
 
-	img, _, err := image.Decode(resp.Body)
+	fullSizeImage, _, err := image.Decode(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("unable to decode artist image:%s ", err)
 	}
 
+	resizedImage := imaging.Resize(fullSizeImage, 0, 110, imaging.Lanczos)
+
 	out := bytes.Buffer{}
-	err = png.Encode(&out, img)
+	err = jpeg.Encode(&out, resizedImage, nil)
 
 	return out.Bytes(), err
 }

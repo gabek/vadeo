@@ -1,6 +1,7 @@
 package artistimage
 
 import (
+	"log"
 	"os"
 	"path/filepath"
 )
@@ -8,8 +9,17 @@ import (
 var cacheLocation = filepath.Join(os.TempDir(), "vadeo-artist-cache")
 
 func setCachedImage(name string, image []byte) {
+	if !doesFileExist(cacheLocation) {
+		if err := os.Mkdir(cacheLocation, 0770); err != nil {
+			log.Println("error creating cache directory:", err)
+			return
+		}
+	}
+
 	f := filepath.Join(cacheLocation, name)
-	os.WriteFile(f, image, 0644)
+	if err := os.WriteFile(f, image, 0644); err != nil {
+		log.Println("error writing cache file:", err)
+	}
 }
 
 func getCachedImage(name string) []byte {

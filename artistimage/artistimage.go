@@ -1,7 +1,11 @@
 package artistimage
 
 import (
-	"io"
+	"bytes"
+	"fmt"
+	"image"
+	_ "image/jpeg"
+	"image/png"
 	"log"
 	"net/http"
 	"net/url"
@@ -17,23 +21,30 @@ const (
 func GetArtistImage(artistName string) ([]byte, error) {
 	normalizedArtistName := strings.ToLower(url.QueryEscape(artistName))
 
+	img := image.NewRGBA(image.Rect(0, 0, 1, 1))
+	var imageDataBuffer bytes.Buffer
+	if err := png.Encode(&imageDataBuffer, img); err != nil {
+		log.Println(err)
+	}
+	defaultImageData := imageDataBuffer.Bytes()
+
 	if cached := getCachedImage(normalizedArtistName); cached != nil {
 		return cached, nil
 	}
 
 	imageWebPageURL, err := getImagesURLForArtist(normalizedArtistName)
 	if err != nil {
-		return nil, err
+		return defaultImageData, err
 	}
 
 	imageURL, err := getImageURLAtHTMLURL(imageWebPageURL)
 	if err != nil {
-		return nil, err
+		return defaultImageData, err
 	}
 
 	imageData, err := getImageDataAtURL(imageURL)
 	if err != nil {
-		return nil, err
+		return defaultImageData, err
 	}
 
 	setCachedImage(normalizedArtistName, imageData)
@@ -48,12 +59,15 @@ func getImageDataAtURL(imageURL string) ([]byte, error) {
 	}
 	defer resp.Body.Close()
 
-	d, err := io.ReadAll(resp.Body)
+	img, _, err := image.Decode(resp.Body)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("unable to decode artist image:%s ", err)
 	}
 
-	return d, err
+	out := bytes.Buffer{}
+	err = png.Encode(&out, img)
+
+	return out.Bytes(), err
 }
 
 func getImagesURLForArtist(artist string) (string, error) {

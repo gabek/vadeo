@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/url"
 	"os"
@@ -20,15 +19,15 @@ import (
 )
 
 const (
-	_pollStreamSeconds = time.Second * 7
+	_pollStreamSeconds = time.Second * 9
 )
 
 var (
 	_config = loadConfig()
 
-	_artistTextFile  = filepath.Join(os.TempDir(), "vadio-artist")
-	_trackTextFile   = filepath.Join(os.TempDir(), "vadio-track")
-	_artistImageFile = filepath.Join(os.TempDir(), "vadio-artist-image")
+	_artistTextFile  = filepath.Join(os.TempDir(), "vadeo-artist")
+	_trackTextFile   = filepath.Join(os.TempDir(), "vadeo-track")
+	_artistImageFile = filepath.Join(os.TempDir(), "vadeo-artist-image")
 
 	_stationDescription = ""
 	_stationTitle       = ""
@@ -92,7 +91,7 @@ func start() {
 	var artistImage string
 	if _config.UseArtistImage {
 		// Artist image is scaled down and made into a square.
-		artistImage = `[3:v]scale=110:110,setsar=1:1,crop=110:110[artistimage]; [v][artistimage]overlay=x=(main_w-overlay_w-25):y=(main_h-main_h/4+10)[v]`
+		artistImage = `[3:v]scale=-1:110[artistimage]; [v][artistimage]overlay=x=(main_w-overlay_w-25):y=(main_h-main_h/4+10)[v]`
 	}
 
 	startingInput := "v"
@@ -189,7 +188,7 @@ func start() {
 	}
 	err = cmd.Wait()
 	if err != nil {
-		panic("Error streaming video.  Is your destination and key correct?  Check log.txt for troubleshooting.")
+		panic("Error streaming video.  Is your destination and key correct?  Check log.txt for troubleshooting: " + err.Error())
 	}
 }
 
@@ -255,12 +254,12 @@ func stationMetadataChanged(nowPlaying string) {
 
 	go updateOwncast(nowPlaying)
 
-	if err := ioutil.WriteFile(_artistTextFile, []byte(artist), 0644); err != nil {
+	if err := os.WriteFile(_artistTextFile, []byte(artist), 0644); err != nil {
 		log.Println("unable to write artist text file:", err)
 		return
 	}
 
-	if err := ioutil.WriteFile(_trackTextFile, []byte(track), 0644); err != nil {
+	if err := os.WriteFile(_trackTextFile, []byte(track), 0644); err != nil {
 		log.Println("unable to write track text file:", err)
 		return
 	}
@@ -271,7 +270,7 @@ func stationMetadataChanged(nowPlaying string) {
 			log.Println("unable to download artist image", err)
 		}
 
-		if err := ioutil.WriteFile(_artistImageFile, imageData, 0644); err != nil {
+		if err := os.WriteFile(_artistImageFile, imageData, 0644); err != nil {
 			log.Println("unable to write artist image file:", err)
 			return
 		}

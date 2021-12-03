@@ -1,0 +1,10 @@
+version: '3.2'
+services:
+  vadeo:
+    container_name: vadeo
+    build: .
+    volumes:
+      - ./config.yaml:/app/config.yaml
+      - ./logo.png:/app/logo.png
+      - ./background.mp4:/app/background.mp4
+    restart: unless-stopped

@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -65,22 +66,6 @@ func start() {
 		panic(err)
 	}
 	rtmpDestination.Path = path.Join(rtmpDestination.Path, _config.StreamingKey)
-
-	if _config.AudioBitrate == 0 {
-		_config.AudioBitrate = 128
-	}
-
-	if _config.VideoQualityLevel == 0 {
-		_config.VideoQualityLevel = 25
-	}
-
-	if _config.CPUUsage == "" {
-		_config.CPUUsage = "veryfast"
-	}
-
-	if _config.VideoFramerate == 0 {
-		_config.VideoFramerate = 24
-	}
 
 	audioBitrate := fmt.Sprintf("%dk", _config.AudioBitrate)
 
@@ -164,7 +149,7 @@ func start() {
 		"-preset", _config.CPUUsage,
 		"-profile:v", "high",
 		"-pix_fmt", "yuv420p",
-		"-g", "30",
+		"-g", strconv.Itoa(_config.VideoFramerate * 2),
 		"-crf", fmt.Sprintf("%d", _config.VideoQualityLevel),
 		"-c:a", "aac", "-b:a", audioBitrate, "-ar", "44100",
 

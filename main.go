@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gabek/vadeo/artistimage"
+	"github.com/gabek/vadeo/artistinfo"
 	"github.com/gabek/vadeo/audio"
 	"github.com/gabek/vadeo/metadata"
 	"github.com/gabek/vadeo/owncast"
@@ -198,13 +198,31 @@ func fetchNowPlaying() {
 	}
 }
 
-func updateOwncast(nowPlaying string) {
+func updateOwncast(artist, track string) {
 	if _config.OwncastAccessToken != "" {
 		go func() {
 			// A bit of a hack to offset the fact that the video stream
 			// will be multiple seconds behind.
-			time.Sleep(8 * time.Second)
-			if err := owncast.SetStreamTitle(nowPlaying); err != nil {
+			time.Sleep(6 * time.Second)
+
+			u := "https://www.last.fm/music/" + artist
+			content := "Now Playing"
+			hasImage := false
+			if image, err := artistinfo.GetArtistImageURL(artist); err == nil && image != "" {
+				hasImage = true
+				content += fmt.Sprintf(`<a href="%s"><center><img src="%s" /></center></a>`, u, image)
+			}
+
+			if hasImage {
+				content += fmt.Sprintf(`<a href="%s">`, u)
+			}
+
+			content += fmt.Sprintf(`<center><strong>%s - %s</strong></center>`, artist, track)
+			if hasImage {
+				content += `</a>`
+			}
+
+			if err := owncast.SendSystemMessage(content); err != nil {
 				log.Println(err)
 			}
 		}()
@@ -233,7 +251,7 @@ func stationMetadataChanged(nowPlaying string) {
 		track = _stationTitle
 	}
 
-	go updateOwncast(nowPlaying)
+	go updateOwncast(artist, track)
 
 	if err := os.WriteFile(_artistTextFile, []byte(artist), 0644); err != nil {
 		log.Println("unable to write artist text file:", err)
@@ -246,7 +264,7 @@ func stationMetadataChanged(nowPlaying string) {
 	}
 
 	if _config.UseArtistImage {
-		imageData, err := artistimage.GetArtistImage(artist)
+		imageData, err := artistinfo.GetArtistImage(artist)
 		if err != nil {
 			log.Println("unable to download artist image", err)
 		}

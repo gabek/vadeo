@@ -1,4 +1,4 @@
-package artistimage
+package artistinfo
 
 import (
 	"bytes"
@@ -20,6 +20,20 @@ import (
 const (
 	userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36"
 )
+
+func GetArtistImageURL(artistName string) (string, error) {
+	normalizedArtistName := strings.ToLower(url.QueryEscape(artistName))
+	imageWebPageURL, err := getImagesURLForArtist(normalizedArtistName)
+	if err != nil {
+		return "", err
+	}
+
+	imageURL, err := getImageURLAtHTMLURL(imageWebPageURL)
+	if err != nil {
+		return "", err
+	}
+	return imageURL, nil
+}
 
 func GetArtistImage(artistName string) ([]byte, error) {
 	normalizedArtistName := strings.ToLower(url.QueryEscape(artistName))

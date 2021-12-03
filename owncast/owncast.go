@@ -10,16 +10,19 @@ import (
 	"path"
 )
 
-var owncastAccessToken string
-var owncastServerHost string
+var (
+	owncastAccessToken string
+	owncastServerHost  string
+)
 
 // actionType represents an action you want to perform on Owncast.
 type actionType = string
 
 const (
 	actionMessage  actionType = "/api/integrations/chat/action"
-	systemMessage             = "/api/integrations/chat/system"
-	setStreamTitle            = "/api/integrations/streamtitle"
+	systemMessage  actionType = "/api/integrations/chat/system"
+	userMessage    actionType = "/api/integrations/chat/send"
+	setStreamTitle actionType = "/api/integrations/streamtitle"
 )
 
 // Message represents an Owncast chat-based message.
@@ -57,12 +60,33 @@ func SetStreamTitle(title string) error {
 	return send(setStreamTitle, jsonValue)
 }
 
+// SendSystemMessage will send an official message on behalf of the system.
+func SendSystemMessage(text string) error {
+	jsonValue, _ := json.Marshal(Message{
+		Body: text,
+	})
+
+	return send(systemMessage, jsonValue)
+}
+
+// SendUserMessage will send an official message on behalf of the user..
+func SendUserMessage(text string) error {
+	jsonValue, _ := json.Marshal(Message{
+		Body: text,
+	})
+
+	return send(userMessage, jsonValue)
+}
+
 func send(action actionType, data []byte) error {
 	url, _ := url.Parse(owncastServerHost)
 	url.Path = path.Join(url.Path, action)
 
-	var bearer = "Bearer " + owncastAccessToken
-	req, err := http.NewRequest("POST", url.String(), bytes.NewBuffer(data))
+	bearer := "Bearer " + owncastAccessToken
+	req, err := http.NewRequest(http.MethodPost, url.String(), bytes.NewBuffer(data))
+	if err != nil {
+		return err
+	}
 	req.Header.Add("Authorization", bearer)
 
 	client := &http.Client{}

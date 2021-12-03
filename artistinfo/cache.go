@@ -1,4 +1,4 @@
-package artistimage
+package artistinfo
 
 import (
 	"log"

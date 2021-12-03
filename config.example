@@ -6,9 +6,21 @@ streamingKey: ggv6i-my-key-for-streaming-5rjrx9
 audioUrl: http://16963.live.streamtheworld.com:80/SAM04AAC147_SC
 audioBitrate: 128
 
+# Try to fetch an artist image and display it. This is worth disabling if
+# the audio you stream doesn't have artist names or are harder to discover.
+useArtistImage: true
+
+# Use the real-time audio visualizer.
+useAudioVisualizer: true
+
+fontFile: polentical-neon.ttf
+artistFontSize: 42
+trackFontSize: 37
+
 # This is the bitrate and framerate that vadeo sends to your server, not what your server sends to viewers.
 # https://trac.ffmpeg.org/wiki/Encode/H.264#crf.
-# Video quality level: 0 is lossless, 23 is the default, and 51 is worst quality possible.  You probably want to stick in the 20s for streaming video.
+# Video quality level: 0 is lossless, 23 is the default, and 51 is worst quality possible.
+# You probably want to stick in the 20s for streaming video.
 videoQualityLevel: 25
 framerate: 24
 

@@ -60,3 +60,8 @@ Visit [Owncast's Documentation](https://owncast.online/docs) for additional info
 * If you would like to stream to multiple livestreaming destinations at once, take a look at [Prism](https://github.com/muesli/prism).
 
 * **Disclaimer:** This is a utility for convenience, experimenting and entertainment.  It was thrown together quickly and is likely not production-grade.  Improvements are welcomed, but feature requests are not likely to be implemented. 
+
+## Included assets
+
+* [Polentical Neon font](https://www.dafont.com/polentical-neon.font?l[]=10&l[]=1) (Creative Commons (CC-BY-SA 3.0)
+) included. It has limited characters, so if you require more unicode or international characters you should replace this font with one of your own and specify it in the config file.

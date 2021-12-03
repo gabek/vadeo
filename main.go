@@ -73,12 +73,6 @@ func start() {
 
 	go streamAudio(pw)
 
-	var artistImage string
-	if _config.UseArtistImage {
-		// Artist image position.
-		artistImage = `[v][3:v]overlay=x=(main_w-overlay_w-25):y=(main_h-main_h/4+10)[v]`
-	}
-
 	startingInput := "v"
 	if !_config.UseAudioVisualizer {
 		startingInput = "1:v"
@@ -94,6 +88,8 @@ func start() {
 		`[v][2:v]overlay=x=(main_w-overlay_w-20):y=20[v]`,
 	}
 	if _config.UseArtistImage {
+		// Artist image position.
+		artistImage := `[v][3:v]overlay=x=(main_w-overlay_w-25):y=(main_h-main_h/4+10)[v]`
 		filters = append(filters, artistImage)
 	}
 	if _config.UseAudioVisualizer {
@@ -149,6 +145,8 @@ func start() {
 		"-pix_fmt", "yuv420p",
 		"-g", strconv.Itoa(_config.VideoFramerate * 2),
 		"-crf", fmt.Sprintf("%d", _config.VideoQualityLevel),
+
+		`-tune fastdecode`, `-tune zerolatency`,
 		"-c:a", "aac", "-b:a", audioBitrate, "-ar", "44100",
 
 		"-f", "flv",

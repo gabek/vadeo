@@ -49,7 +49,7 @@ If you are using Vadeo with Owncast you can take advantage of the feature of you
 
 1. Make sure your Owncast server is v0.0.6 or higher.
 1. In the Owncast admin go to the Integrations/Access Tokens screen.
-1. Create a new [access token](https://owncast.online/thirdparty/apis/) with administrative access.
+1. Create a new [access token](https://owncast.online/thirdparty/apis/) with system chat message access.
 1. Edit your Vadeo configure file and paste in your Owncast and access token as `owncastAccessToken`.
 
 Visit [Owncast's Documentation](https://owncast.online/docs) for additional information.

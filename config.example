@@ -1,14 +1,17 @@
-# Required live stream video destination.  Should start with rtmp://
+# Required live stream video destination.  Should start with rtmp://.
+# Check out Owncast if you want to run your own: https://owncast.online.
 streamingURL: rtmp://owncast.myserver.com/live
 streamingKey: ggv6i-my-key-for-streaming-5rjrx9
 
 # Required internet radio station audio URL
-audioUrl: http://16963.live.streamtheworld.com:80/SAM04AAC147_SC
-audioBitrate: 128
+audioUrl: https://ice1.somafm.com/groovesalad-256-mp3
+audioBitrate: 256
 
 # Try to fetch an artist image and display it. This is worth disabling if
 # the audio you stream doesn't have artist names or are harder to discover.
-useArtistImage: true
+# This seems to significantly slow down compositing and might cause buffering
+# so feel free to experiment, but keep expectations low.
+useArtistImage: false
 
 # Use the real-time audio visualizer.
 useAudioVisualizer: true

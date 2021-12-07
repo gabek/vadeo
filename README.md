@@ -5,9 +5,12 @@
 People like video streams, but that doesn't mean your internet radio station has to be ignored.  Stream your shoutcast-compatible internet radio station as a live video stream and reach a whole new audience.
 
 <p>
-    <center>
-        <img src="screenshot.jpg" width=70%>
-    </center>
+    <a href="https://listen.batstationrad.io/">
+        <center>
+            <img src="https://listen.batstationrad.io/preview.gif" width=70%>
+            <p>Live example stream from The Bat Station.</p>
+        </center>
+    </a>
 </p>
 
 ## What it does
